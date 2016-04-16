@@ -1,0 +1,29 @@
+<ion-modal-view ng-controller="AddTypeCtrl">
+    <ion-header-bar>
+      <h1 class="title">{{language.get("create-msg")}}</h1>
+    </ion-header-bar>
+
+    <ion-content>
+
+      <form ng-submit="addType()" novalidate>
+
+        <div class="list list-inset">
+          <label class="item item-input">
+            <input type="text" placeholder="Type" ng-model="patient.type">
+          </label>
+          <label class="item item-input">
+            <input type="text" placeholder="Name" ng-model="patient.name">
+          </label>
+          <label class="item item-input">
+            <input type="text" placeholder="Description" ng-model="patient.desc">
+          </label>
+
+          <div>
+
+            <button type="button" class="button button-block button-positive" ng-click="addTypeData()">{{language.get('create')}}</button>
+          </div> <!-- ENDS buttons -->
+        </div> <!-- ENDS list -->
+      </form>
+      <br>
+    </ion-content>
+  </ion-modal-view>

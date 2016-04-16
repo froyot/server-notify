@@ -1,0 +1,12 @@
+<ion-view view-title="{{msgkey}}">
+  <ion-content>
+    <ion-list>
+      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="msg in msgs" type="item-text-wrap" href="#/tab/msg-detail/{{msg.id}}">
+
+        <h2>{{msg.get('title')}}</h2>
+        <p>{{msg.get('sortMsg')}}</p>
+        <i class="icon ion-chevron-right icon-accessory"></i>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>
