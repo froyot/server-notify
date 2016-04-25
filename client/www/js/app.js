@@ -10,7 +10,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services','s
 .run(function($ionicPlatform) {
 
 
-  AV.initialize('APP_ID', 'APP_KEY');
+  // AV.initialize('09ikb5kf8v4js4m4rghs96daff0jti962o9pjvnq69a2tgzt', '5zl08tkt5rqa3nc3yc4rnf2cgs8pkds3h5fmkgrlwvzb9y4u');
+  AV.initialize('app_id', 'app_key');
   $ionicPlatform.ready(function() {
     // window.LeanPush.init();
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -44,7 +45,12 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services','s
     templateUrl: 'templates/login.html',
     controller : 'LoginController'
   })
-
+  .state('githubLogin',{
+    url: '/githubLogin',
+    // abstract: true,
+    templateUrl: 'templates/githubLogin.html',
+    controller : 'GithubLoginController'
+  })
   // setup an abstract state for the tabs directive
   .state('tab', {
     url: '/tab',

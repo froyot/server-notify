@@ -102,6 +102,132 @@ angular.module('starter.services', [])
   }
 })
 
+.factory('GithubUser',['$http','$q',
+function($http, $q) {
+
+  function addAuth(username,password)
+  {
+    var authdata = btoa(username + ':' + password);
+    $http.defaults.headers.common['Authorization'] = "Basic "+authdata; // jshint ignore:line
+    // $http.defaults.headers.common.Authorization = 'Basic ';
+  }
+
+
+
+  return {
+    login:function(username,password){
+    var deferred = $q.defer();
+
+    var success = function(data)
+    {
+      console.log(data);
+       deferred.resolve(data);
+    }
+
+    var error = function(data,status)
+    {
+      console.log(data);
+      deferred.reject(status,data);
+    }
+
+    addAuth(username,password);
+    var url ="https://api.github.com/user";
+    $http({method: 'GET', "url":url}).
+    success(function(data, status, headers, config) {
+      if(data)
+      {
+        var authDataTrue = {"id":btoa("githubid:"+data.id+"type:github")};
+        var githubName = data.login;
+        AV.User._logInWith("anonymous",{"authData":authDataTrue}).then(function(data){
+          AV.User.current().setUsername(githubName);
+          success(data);
+        },error);
+      }
+       // 声明执行成功，即http请求数据成功，可以返回数据了
+    },error);
+
+    return deferred.promise;
+    }
+  }
+}
+])
+
+.factory('User',function($q){
+  var user = null;
+  return {
+    current:function(){
+      if(user)
+      {
+        return user;
+      }else
+      {
+        user = AV.User.current();
+        return user;
+      }
+    },
+    setUser:function(data)
+    {
+      this.current();
+      use = data;
+    },
+    setStorage:function()
+    {
+      this.current();
+      window.localStorage.setItem("user_id", user.id);
+      window.localStorage.setItem("user_name", user.getUsername());
+      window.localStorage.setItem("token", user._sessionToken);
+    },
+    getUserName:function()
+    {
+      this.current();
+      var username = window.localStorage.getItem("user_name");
+      if(username)
+      {
+        return username;
+      }
+      else
+      {
+        if(user)
+        return user.getUsername();
+      else
+        return "";
+      }
+    },
+    logout:function()
+    {
+      this.current();
+      var error = function(data)
+      {
+        console.log(data);
+        deferred.reject(data);
+      }
+
+        AV.User.logOut();
+
+        window.localStorage.removeItem("user_id");
+        window.localStorage.removeItem("user_name");
+        window.localStorage.removeItem("token");
+
+
+
+    },
+    updateInstallId:function(installData)
+    {
+
+      if(installData)
+      {
+
+        user.set("installationId",installData.installationId);
+        user.save().then(function() {
+
+          // 成功
+        },function(err) {
+
+        });
+      }
+    }
+  }
+})
 .factory('Notifys', ['$http','$q',
   function($http, $q) {
   return {
@@ -147,3 +273,4 @@ angular.module('starter.services', [])
   }
 
 }]);
+

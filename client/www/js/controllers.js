@@ -1,4 +1,27 @@
 angular.module('starter.controllers', [])
+.controller('GithubLoginController',function($scope,$state,Zh,GithubUser,User){
+  $scope.language = Zh;
+  $scope.user = {"username":"","password":""};
+  $scope.login = function()
+  {
+    GithubUser.login($scope.user.username,$scope.user.password).then(function(data){
+      console.log(data);
+      User.setStorage();
+
+      //更新推送token
+      var installData = _notifyHandler.getInstallationData();
+      User.updateInstallId(installData);
+
+      $state.go('tab.dash');return;
+    },function(status,data){
+      if(status != 200)
+      {
+        alert("用户名或密码错误");return false;
+      }
+
+    });
+  }
+})
 
 .controller('AddTypeCtrl',function($scope,Zh,MsgType){
     $scope.patient = {};
@@ -86,7 +109,7 @@ angular.module('starter.controllers', [])
 
 
 //登陆控制器
-.controller('LoginController',[ '$scope', '$state','Zh', function($scope, $state,Zh) {
+.controller('LoginController',[ '$scope', '$state','Zh','User', function($scope, $state,Zh,User) {
         $scope.language = Zh;
         $scope.user = {
             username: null,
@@ -98,27 +121,11 @@ angular.module('starter.controllers', [])
             alert("AuthenticateUser failed");
           };
           var success = function(response){
-                var user = AV.User.current()
-
-                window.localStorage.setItem("user_id", user.id);
-                window.localStorage.setItem("user_name", user.getUsername());
-                window.localStorage.setItem("token", user._sessionToken);
-
+                User.setStorage();
 
                 //更新推送token
                 var installData = _notifyHandler.getInstallationData();
-                if(installData)
-                {
-
-                  user.set("installationId",installData.installationId);
-                  user.save().then(function() {
-
-                    // 成功
-                  },function(err) {
-
-                  });
-                }
-
+                User.updateInstallId(installData);
                 $state.go('tab.dash');return;
           };
           AV.User.logIn($scope.user.username,$scope.user.password).then(success,error);
@@ -151,11 +158,18 @@ angular.module('starter.controllers', [])
 
 
 
-.controller('SettingCtrl', function($scope,Zh) {
+.controller('SettingCtrl', function($scope,$state,Zh,User) {
   $scope.language = Zh;
+  $scope.user = {"username":User.getUserName()};
   $scope.settings = {
     enableFriends: true
   };
+  $scope.logout = function(){
+    User.logout();
+      alert('logout success');
+      $state.go('login');return;
+
+  }
 })
 
 

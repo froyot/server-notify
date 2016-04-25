@@ -35,6 +35,5 @@
   },
   "_source": "https://github.com/leancloud/javascript-sdk.git",
   "_target": "^0.6.4",
-  "_originalSource": "leancloud-javascript-sdk",
-  "_direct": true
+  "_originalSource": "leancloud-javascript-sdk"
 }

@@ -6,7 +6,9 @@ var language = {
     "dashboard":"首页",
     "contact":"联系人",
     "setting":"设置",
-    "create-msg":"创建新类别"
+    "create-msg":"创建新类别",
+    "account":"账号",
+    "action":"操作"
 }
 
 

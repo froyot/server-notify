@@ -1,9 +1,22 @@
 <ion-view view-title="{{language.get('setting')}}">
   <ion-content>
     <ion-list>
+     <div class="item item-divider">
+        {{language.get("account")}}
+      </div>
+    <a class="item" >
+      <h2>{{user.username}}</h2>
+    </a>
+    <div class="item item-divider">
+        {{language.get("action")}}
+    </div>
     <ion-toggle  ng-model="settings.enableFriends">
         Enable Friends
     </ion-toggle>
+<div class="item bar bar-header bar-royal">
+  <h1 class="title" ng-click="logout()">{{language.get("logout")}}</h1>
+</div>
     </ion-list>
+
   </ion-content>
 </ion-view>
