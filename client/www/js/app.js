@@ -10,10 +10,9 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services','s
 .run(function($ionicPlatform) {
 
 
-  // AV.initialize('09ikb5kf8v4js4m4rghs96daff0jti962o9pjvnq69a2tgzt', '5zl08tkt5rqa3nc3yc4rnf2cgs8pkds3h5fmkgrlwvzb9y4u');
   AV.initialize('app_id', 'app_key');
   $ionicPlatform.ready(function() {
-    // window.LeanPush.init();
+
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
     if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
@@ -39,12 +38,12 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services','s
   // Each state's controller can be found in controllers.js
   $stateProvider
 
-  .state('login',{
-    url: '/login',
-    // abstract: true,
-    templateUrl: 'templates/login.html',
-    controller : 'LoginController'
-  })
+  // .state('login',{
+  //   url: '/login',
+  //   // abstract: true,
+  //   templateUrl: 'templates/login.html',
+  //   controller : 'LoginController'
+  // })
   .state('githubLogin',{
     url: '/githubLogin',
     // abstract: true,
@@ -71,7 +70,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services','s
     }
   })
   .state('tab.message', {
-      url: '/message/:type',
+      url: '/message/:type/:typeName',
       views: {
         'tab-dash': {
           templateUrl: 'templates/message/msg.html',

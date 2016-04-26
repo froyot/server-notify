@@ -1,9 +1,13 @@
 angular.module('starter.controllers', [])
-.controller('GithubLoginController',function($scope,$state,Zh,GithubUser,User){
+.controller('GithubLoginController',function($scope,$state,Zh,GithubUser,User,$ionicLoading,$ionicHistory){
   $scope.language = Zh;
-  $scope.user = {"username":"","password":""};
+  $scope.user = {"username":"xianlong.wang@dev-engine.com","password":"wang900206"};
+
+$ionicHistory.clearHistory();
   $scope.login = function()
   {
+    $ionicLoading.show();
+
     GithubUser.login($scope.user.username,$scope.user.password).then(function(data){
       console.log(data);
       User.setStorage();
@@ -11,19 +15,24 @@ angular.module('starter.controllers', [])
       //更新推送token
       var installData = _notifyHandler.getInstallationData();
       User.updateInstallId(installData);
-
+      $ionicLoading.hide();
       $state.go('tab.dash');return;
     },function(status,data){
-      if(status != 200)
+      $ionicLoading.hide();
+      if(status == 401)
       {
         alert("用户名或密码错误");return false;
+      }
+      else if(status == 0)
+      {
+        alert("网络连接失败，稍后再试");return false;
       }
 
     });
   }
 })
 
-.controller('AddTypeCtrl',function($scope,Zh,MsgType){
+.controller('AddTypeCtrl',function($scope,Zh,MsgType,$ionicLoading){
     $scope.patient = {};
    $scope.openAddTypeModal = function() {
       $scope.addModal.show();
@@ -34,11 +43,14 @@ angular.module('starter.controllers', [])
    };
    $scope.addTypeData = function()
    {
-       var user_id = window.localStorage.getItem("user_id");
+      $ionicLoading.show();
+      var user_id = window.localStorage.getItem("user_id");
       MsgType.createMsgType(user_id, $scope.patient.type,$scope.patient.name,$scope.patient.desc).then(function(data){
           $scope.msgTypes.push(data);
           $scope.addModal.hide();
+          $ionicLoading.hide();
       },function(error){
+        $ionicLoading.hide();
         if('status' in error)
         {
           alert(error.error);
@@ -65,7 +77,7 @@ angular.module('starter.controllers', [])
 })
 
 //首页控制器
-.controller('DashCtrl', function($scope,$ionicModal,Zh,MsgType) {
+.controller('DashCtrl', function($scope,$ionicModal,Zh,MsgType,$ionicLoading) {
   //设置页面语言
   $scope.language = Zh;
   var msgTypes = [];
@@ -74,10 +86,16 @@ angular.module('starter.controllers', [])
 
   if($scope.user_id)
   {
+    $ionicLoading.show();
     MsgType.getMsgTypes($scope.user_id).then(function(datas){
       msgTypes = datas;
+      $ionicLoading.hide();
       updateMsgTypes();
-    })
+    },
+    function(data){
+      $ionicLoading.hide();
+    }
+    )
   }
 
   $ionicModal.fromTemplateUrl('templates/addType.html', {
@@ -93,11 +111,14 @@ angular.module('starter.controllers', [])
 
    $scope.remove = function(msgType)
    {
-
+    $ionicLoading.show();
     msgTypes.splice(msgTypes.indexOf(msgType), 1);
     updateMsgTypes();
     var msgTypeCopty = msgType;
     msgTypeCopty.destroy().then(function(data){
+      $ionicLoading.hide();
+     },function(data){
+      $ionicLoading.hide();
      });
 
    }
@@ -109,16 +130,19 @@ angular.module('starter.controllers', [])
 
 
 //登陆控制器
-.controller('LoginController',[ '$scope', '$state','Zh','User', function($scope, $state,Zh,User) {
+.controller('LoginController',function($scope, $state,$ionicHistory,Zh,User,$ionicLoading) {
         $scope.language = Zh;
         $scope.user = {
             username: null,
             password: null
         };
-
+        $ionicHistory.clearHistory();
         $scope.login = function() {
+          $ionicLoading.show();
+
           var error = function(error){
-            alert("AuthenticateUser failed");
+            $ionicLoading.hide();
+
           };
           var success = function(response){
                 User.setStorage();
@@ -126,26 +150,31 @@ angular.module('starter.controllers', [])
                 //更新推送token
                 var installData = _notifyHandler.getInstallationData();
                 User.updateInstallId(installData);
+                $ionicHistory.clearHistory();
+                $ionicLoading.hide();
                 $state.go('tab.dash');return;
           };
           AV.User.logIn($scope.user.username,$scope.user.password).then(success,error);
         }
-}])
+})
 
 
 //tab控制器
-.controller('TabController',[ '$scope', '$state','Zh','$rootScope', function($scope, $state,Zh,$rootScope) {
+.controller('TabController',function($scope, $state,Zh,$rootScope,$ionicHistory) {
         $scope.language = Zh;
+        $ionicHistory.clearHistory();
         if(!window.localStorage.getItem("user_id"))
         {
-          $state.go('login');return;
+
+          $state.go('githubLogin');return;
         }
 
 
         _notifyHandler.setGetMessage($state,function(data){
             if('state' in data)
             {
-              $state.go(data.state,{'type':data.type},{location:true});
+
+              $state.go(data.state,{'type':data.type,'typeName':""},{location:true});
             }
 
         });
@@ -153,38 +182,47 @@ angular.module('starter.controllers', [])
 
 
 
-}])
+})
 
 
 
 
-.controller('SettingCtrl', function($scope,$state,Zh,User) {
+.controller('SettingCtrl', function($scope,$state,Zh,User,$ionicLoading) {
   $scope.language = Zh;
-  $scope.user = {"username":User.getUserName()};
+
+  $scope.user = {"username":User.getNickname(),"secureKey":User.getSecureKey()};
   $scope.settings = {
     enableFriends: true
   };
   $scope.logout = function(){
+
     User.logout();
-      alert('logout success');
-      $state.go('login');return;
+
+      $state.go('githubLogin');return;
 
   }
 })
 
 
 //消息列表控制器
-.controller('MessageCtrl', function($scope,$stateParams,Notifys,Zh) {
+.controller('MessageCtrl', function($scope,$stateParams,Notifys,Zh,MsgType,$ionicHistory) {
 
     var page = 1;
     $scope.language = Zh;
     $scope.type = $stateParams.type;
-
+    $scope.typeName = $stateParams.typeName;
     var user_id = window.localStorage.getItem("user_id");
+
+    var entryViewId = $ionicHistory.viewHistory().views;
     if(user_id)
     {
 
-
+    if(!$scope.typeName)
+    {
+      MsgType.getMsgType(user_id,$scope.type).then(function(data){
+        $scope.typeName = data.get("name");
+      });
+    }
     Notifys.getMessage(user_id, $scope.type,page).then(function(data){
           $scope.msgs = data;
         },function(error){});

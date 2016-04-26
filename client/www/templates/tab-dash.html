@@ -3,7 +3,7 @@
 <ion-view view-title="{{language.get('dashboard')}}">
   <ion-content>
     <ion-list>
-      <ion-item class="item-icon-right" type="item-text-wrap" ng-repeat="msgType in msgTypes" href="#/tab/message/{{msgType.get('type')}}">
+      <ion-item class="item-icon-right" type="item-text-wrap" ng-repeat="msgType in msgTypes" href="#/tab/message/{{msgType.get('type')}}/{{msgType.get('name')}}">
 
         <h2>{{msgType.get('name')}}</h2>
         <p>{{msgType.get('des')}}</p>

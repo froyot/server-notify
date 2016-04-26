@@ -8,7 +8,8 @@ var language = {
     "setting":"设置",
     "create-msg":"创建新类别",
     "account":"账号",
-    "action":"操作"
+    "action":"操作",
+    "githubLogin":"github 账号登陆"
 }
 
 

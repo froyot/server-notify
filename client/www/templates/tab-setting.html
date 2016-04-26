@@ -4,18 +4,22 @@
      <div class="item item-divider">
         {{language.get("account")}}
       </div>
-    <a class="item" >
-      <h2>{{user.username}}</h2>
-    </a>
+    <div class="item" >
+      <h2>Nickname: {{user.username}}</h2>
+    </div>
+     <div class="item">
+        SecureKey:{{user.secureKey}}
+    </div>
     <div class="item item-divider">
         {{language.get("action")}}
     </div>
-    <ion-toggle  ng-model="settings.enableFriends">
-        Enable Friends
-    </ion-toggle>
-<div class="item bar bar-header bar-royal">
-  <h1 class="title" ng-click="logout()">{{language.get("logout")}}</h1>
-</div>
+
+
+      <ion-item class="item" type="item-text-wrap">
+
+       <button class="button button-block button-positive" ng-click="logout()">{{language.get("logout")}}</button>
+         </ion-item>
+
     </ion-list>
 
   </ion-content>

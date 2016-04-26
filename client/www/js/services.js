@@ -34,6 +34,7 @@ angular.module('starter.services', [])
 })
 
 .factory('MsgType',function($http, $q){
+
   return {
     getMsgTypes:function(user_id)
     {
@@ -57,6 +58,34 @@ angular.module('starter.services', [])
       query.equalTo("user_id",user_id);
       query.limit(20);
       query.find(success,error);
+      }catch(e)
+      {
+        alert(e);
+      }
+      return deferred.promise;
+    },
+    getMsgType:function(user_id,type){
+      var deferred = $q.defer();
+      var success = function(response){
+      try{
+        if(response)
+        deferred.resolve(response);
+      }catch(e)
+      {
+        alert(e);
+      }
+      }
+
+      var error = function(error){
+        alert(error);
+        deferred.reject(error);
+      }
+      try{
+      var query = new AV.Query("msgType");
+      query.equalTo("user_id",user_id);
+      query.equalTo("type",type);
+      query.limit(20);
+      query.first(success,error);
       }catch(e)
       {
         alert(e);
@@ -129,6 +158,16 @@ function($http, $q) {
       console.log(data);
       deferred.reject(status,data);
     }
+    function randomString(len) {
+  　　len = len || 32;
+  　　var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';    /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
+  　　var maxPos = $chars.length;
+  　　var pwd = '';
+  　　for (i = 0; i < len; i++) {
+  　　　　pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
+  　　}
+  　　return pwd;
+  }
 
     addAuth(username,password);
     var url ="https://api.github.com/user";
@@ -139,12 +178,18 @@ function($http, $q) {
         var authDataTrue = {"id":btoa("githubid:"+data.id+"type:github")};
         var githubName = data.login;
         AV.User._logInWith("anonymous",{"authData":authDataTrue}).then(function(data){
-          AV.User.current().setUsername(githubName);
+          AV.User.current().set("nickname",githubName);
+          if(!AV.User.current().get('secure_key'))
+          {
+            AV.User.current().set("secure_key",randomString(8));
+          }
+          AV.User.current().save();
           success(data);
         },error);
       }
        // 声明执行成功，即http请求数据成功，可以返回数据了
-    },error);
+    }).
+    error(error);
 
     return deferred.promise;
     }
@@ -174,24 +219,33 @@ function($http, $q) {
     {
       this.current();
       window.localStorage.setItem("user_id", user.id);
-      window.localStorage.setItem("user_name", user.getUsername());
+      window.localStorage.setItem("nickname", user.get("nickname"));
       window.localStorage.setItem("token", user._sessionToken);
     },
-    getUserName:function()
+    getNickname:function()
     {
       this.current();
-      var username = window.localStorage.getItem("user_name");
-      if(username)
+      var nickname = window.localStorage.getItem("nickname");
+      if(nickname)
       {
-        return username;
+        return nickname;
       }
       else
       {
         if(user)
-        return user.getUsername();
+        return user.get("nickname");
       else
         return "";
       }
+    },
+    getSecureKey:function()
+    {
+      this.current();
+      if(user)
+        return user.get("secure_key");
+      else
+        return "";
+
     },
     logout:function()
     {
@@ -205,7 +259,7 @@ function($http, $q) {
         AV.User.logOut();
 
         window.localStorage.removeItem("user_id");
-        window.localStorage.removeItem("user_name");
+        window.localStorage.removeItem("nickname");
         window.localStorage.removeItem("token");
 
 
